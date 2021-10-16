@@ -70,62 +70,6 @@ p5.prototype.createOscillator = function _createOscillator(freq, type) {
   return new p5.Oscillator(freq, type);
 };
 
-p5.prototype._updateNextMouseCoords = function(e) {
-  if (this._curElement !== null && (!e.touches || e.touches.length > 0)) {
-    const mousePos = getMousePos(
-      this._curElement.elt,
-      this.width,
-      this.height,
-      e
-    );
-    if (this._coordinateMode === this.RIGHT_HAND) {
-      mousePos.y = this.height - mousePos.y;
-      mousePos.winY = this.height - mousePos.winY;
-    }
-    this._setProperty('movedX', e.movementX);
-    this._setProperty('movedY', e.movementY);
-    this._setProperty('mouseX', mousePos.x);
-    this._setProperty('mouseY', mousePos.y);
-    this._setProperty('winMouseX', mousePos.winX);
-    this._setProperty('winMouseY', mousePos.winY);
-  }
-  if (!this._hasMouseInteracted) {
-    // For first draw, make previous and next equal
-    this._updateMouseCoords();
-    this._setProperty('_hasMouseInteracted', true);
-  }
-};
-
-p5.prototype._updateMouseCoords = function() {
-  this._setProperty('pmouseX', this.mouseX);
-  this._setProperty('pmouseY', this.mouseY);
-  this._setProperty('pwinMouseX', this.winMouseX);
-  this._setProperty('pwinMouseY', this.winMouseY);
-
-  this._setProperty('_pmouseWheelDeltaY', this._mouseWheelDeltaY);
-};
-
-function getMousePos(canvas, w, h, evt) {
-  if (evt && !evt.clientX) {
-    // use touches if touch and not mouse
-    if (evt.touches) {
-      evt = evt.touches[0];
-    } else if (evt.changedTouches) {
-      evt = evt.changedTouches[0];
-    }
-  }
-  const rect = canvas.getBoundingClientRect();
-  const sx = canvas.scrollWidth / w || 1;
-  const sy = canvas.scrollHeight / h || 1;
-  return {
-    x: (evt.clientX - rect.left) / sx,
-    y: (evt.clientY - rect.top) / sy,
-    winX: evt.clientX,
-    winY: evt.clientY,
-    id: evt.identifier
-  };
-}
-
 // ====================================
 // Transformations
 // ====================================
@@ -474,6 +418,10 @@ p5.prototype._updateNextMouseCoords = function(e) {
       this.height,
       e
     );
+    if (this._coordinateMode === this.RIGHT_HAND) {
+      mousePos.y = this.height - mousePos.y;
+      mousePos.winY = this.height - mousePos.winY;
+    }
     this._setProperty('movedX', e.movementX);
     this._setProperty('movedY', e.movementY);
     this._setProperty('mouseX', mousePos.x);
@@ -486,15 +434,6 @@ p5.prototype._updateNextMouseCoords = function(e) {
     this._updateMouseCoords();
     this._setProperty('_hasMouseInteracted', true);
   }
-};
-
-p5.prototype._updateMouseCoords = function() {
-  this._setProperty('pmouseX', this.mouseX);
-  this._setProperty('pmouseY', this.mouseY);
-  this._setProperty('pwinMouseX', this.winMouseX);
-  this._setProperty('pwinMouseY', this.winMouseY);
-
-  this._setProperty('_pmouseWheelDeltaY', this._mouseWheelDeltaY);
 };
 
 function getMousePos(canvas, w, h, evt) {
@@ -517,7 +456,3 @@ function getMousePos(canvas, w, h, evt) {
     id: evt.identifier
   };
 }
-
-// ====================================
-// 
-// ====================================
