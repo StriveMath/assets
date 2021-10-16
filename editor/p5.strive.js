@@ -145,17 +145,6 @@ p5.prototype.text = function(str, x, y, maxWidth, maxHeight) {
   return output;
 };
 
-p5.prototype.mouse = function() {
-  const inverse = math.inv(this._basisMatrix);
-  const tMouseX = this.mouseX * inverse.get([0, 0]) + this.mouseY * inverse.get([1, 0]) + 1 * inverse.get([2, 0]);
-  const tMouseY = this.mouseX * inverse.get([0, 1]) + this.mouseY * inverse.get([1, 1]) + 1 * inverse.get([2, 1]);
-
-  return {
-    x: tMouseX,
-    y: tMouseY,
-  };
-};
-
 p5.prototype.registerMethod('init', function () {
   this._basisMatrix = math.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
 });
@@ -380,8 +369,8 @@ class MovableCircle {
       this.pInst.fill('red');
     }
     if (this.isMovable) {
-      this.x = this.pInst.mouse().x;
-      this.y = this.pInst.mouse().y;
+      this.x = this.pInst.mouseX;
+      this.y = this.pInst.mouseY;
     }
     this.pInst.circle(this.x, this.y, this.d);
     this.makeMovable();
@@ -389,7 +378,7 @@ class MovableCircle {
   }
 
   isMouseHovering() {
-      return this.pInst.dist(this.pInst.mouse().x, this.pInst.mouse().y, this.x, this.y) < this.d / 2;
+      return this.pInst.dist(this.pInst.mouseX, this.pInst.mouseY, this.x, this.y) < this.d / 2;
   }
 
   makeMovable() {
