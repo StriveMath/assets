@@ -122,6 +122,27 @@ p5.prototype.scale = function(x, y, z) {
   return this;
 };
 
+p5.prototype.push = function() {
+  this._bases.push(math.matrix(this._basisMatrix));
+  this._styles.push({
+    props: {
+      _colorMode: this._colorMode
+    },
+    renderer: this._renderer.push()
+  });
+};
+
+p5.prototype.pop = function() {
+  const style = this._styles.pop();
+  if (style) {
+    this._renderer.pop(style.renderer);
+    Object.assign(this, style.props);
+    this._basisMatrix = this._bases.pop();
+  } else {
+    console.warn('pop() was called without matching push()');
+  }
+};
+
 // ====================================
 // Typography
 // ====================================
@@ -146,6 +167,7 @@ p5.prototype.text = function(str, x, y, maxWidth, maxHeight) {
 };
 
 p5.prototype.registerMethod('init', function () {
+  this._bases = [];
   this._basisMatrix = math.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
 });
 
