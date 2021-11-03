@@ -679,3 +679,10 @@
    }
  };
  
+ 
+ // Python renaming
+ 
+ p5.prototype.linmap = function (value, start1, stop1, start2, stop2, withinBounds) {
+   return this.map(value, start1, stop1, start2, stop2, withinBounds);
+ };
+ 
