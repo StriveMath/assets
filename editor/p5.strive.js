@@ -98,66 +98,69 @@ p5.prototype.responsiveText = function (val, x, y) {
 };
 
 p5.prototype.drawTickAxes = function (
-  lineColor = "rgb(20,45,217)",
-  thickness = 3,
   spacing = 50,
-  xoffset = 0,
-  yoffset = 0
+  axisColor = "rgb(20,45,217)",
+  gridColor = "rgba(255,255,255,0.6)",
+  labelColor = "white",
+  labelSize = 12,
+  axisThickness = 5,
+  tickThickness = 3,
+  gridThickness = 0.25
 ) {
   this.push();
+  this.textSize(labelSize);
   this.textAlign(this.CENTER, this.CENTER);
-  this.translate(xoffset, yoffset);
   for (let y = 0; y < this.height; y += spacing) {
     // tickmarks
-    this.stroke(lineColor);
-    this.strokeWeight(thickness);
+    this.stroke(axisColor);
+    this.strokeWeight(tickThickness);
     this.line(5, y, -5, y);
     this.line(5, -y, -5, -y);
 
     // labels
     if (y !== 0) {
-      this.fill("white");
+      this.fill(labelColor);
       this.noStroke();
       this.responsiveText(y, 2 * this.textSize(), y);
       this.responsiveText(-y, 2 * this.textSize(), -y);
     }
 
     // gridlines
-    this.strokeWeight(0.25);
-    this.stroke(this.color("rgba(255,255,255,0.6)"));
+    this.strokeWeight(gridThickness);
+    this.stroke(this.color(gridColor));
     this.line(-this.width, y, this.width, y);
     this.line(-this.width, -y, this.width, -y);
   }
 
   for (let x = 0; x < this.width; x += spacing) {
     // tickmarks
-    this.stroke(lineColor);
-    this.strokeWeight(thickness);
+    this.stroke(axisColor);
+    this.strokeWeight(tickThickness);
     this.line(x, +5, x, -5);
     this.line(-x, +5, -x, -5);
 
     // labels
     if (x !== 0) {
-      this.fill("white");
+      this.fill(labelColor);
       this.noStroke();
       this.responsiveText(x, x, 1.5 * this.textSize());
       this.responsiveText(-x, -x, 1.5 * this.textSize());
     }
 
     // gridlines
-    this.strokeWeight(0.25);
-    this.stroke(this.color("rgba(255,255,255,0.6)"));
+    this.strokeWeight(gridThickness);
+    this.stroke(this.color(gridColor));
     this.line(x, -this.height, x, this.height);
     this.line(-x, -this.height, -x, this.height);
   }
-  this.stroke(lineColor);
-  this.strokeWeight(5);
+  this.stroke(axisColor);
+  this.strokeWeight(axisThickness);
   // x-axis
   this.line(-this.width, 0, this.width, 0);
   // y-axis
   this.line(0, this.height, 0, -this.height);
   // origin
-  this.fill("white");
+  this.fill(labelColor);
   this.noStroke();
   this.responsiveText(0, this.textSize(), this.textSize());
   this.pop();
@@ -323,6 +326,67 @@ p5.prototype.unixTime = function () {
   return Math.round(Date.now() / 1000);
 };
 
+// Heavily inspired by p5.SceneManager
+p5.prototype.createManager = function () {
+  const pInst = this;
+
+  class Manager {
+    constructor() {
+      this.m;
+      this.milestones = {};
+      this.events = [
+        "mouseClicked",
+        "mousePressed",
+        "mouseReleased",
+        "mouseMoved",
+        "mouseDragged",
+        "doubleClicked",
+        "mouseWheel",
+        "keyPressed",
+        "keyReleased",
+        "keyTyped",
+        "touchStarted",
+        "touchMoved",
+        "touchEnded",
+        "deviceMoved",
+        "deviceTurned",
+        "deviceShaken",
+      ];
+    }
+
+    add(m, fn) {
+      this.milestones[m] = fn;
+    }
+
+    play(m) {
+      this.stop();
+      this.m = new p5(this.milestones[m], "sketch-holder");
+    }
+
+    keyPressed() {
+      if (this.m && "keyPressed" in this.m) {
+        this.m.key = pInst.key;
+        this.m.keyPressed();
+      }
+    }
+
+    keyReleased() {
+      if (this.m && "keyReleased" in this.m) {
+        this.m.key = pInst.key;
+        this.m.keyReleased();
+      }
+    }
+
+    stop() {
+      if (this.m) {
+        this.m.remove();
+      }
+    }
+  }
+
+  return new Manager();
+};
+
 // ====================================
 // Python Compatibility
 // ====================================
@@ -370,8 +434,9 @@ p5.prototype._loadFont = p5.prototype.loadFont;
 p5.prototype.loadFont = function (path, name) {
   this._assetsRemaining += 1;
   let _path = path;
-  if (path === 'Press Start 2P') {
-    _path = 'https://cdn.jsdelivr.net/gh/StriveMath/fonts/Press_Start_2P/PressStart2P-Regular.ttf';
+  if (path === "Press Start 2P") {
+    _path =
+      "https://cdn.jsdelivr.net/gh/StriveMath/fonts/Press_Start_2P/PressStart2P-Regular.ttf";
   }
   this.assets[name] = this._loadFont(_path);
 };
