@@ -451,7 +451,6 @@ p5.prototype.drawBarGraph = function (
   let barHeight = 2;
   this.push();
   this.textAlign(this.CENTER, this.CENTER);
-  this.textSize(18);
   this.translate(ox, oy);
   // Axes
   this.fill(axisColor);
